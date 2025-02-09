@@ -2,27 +2,22 @@ package main
 
 import (
 	"embed"
-	"fmt"
+	"html/template"
 	"os"
 	"path/filepath"
-	"text/template"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 const BASE_DIR = ".therion"
+const DAILY_DIR = "daily"
 
 type operation string
 
 const ()
 
 type file struct {
-	Id      uuid.UUID `json:"id"`
-	Path    string    `json:"path"`
-	modTime time.Time
-	data    []byte
-	op      operation
+	path string
+	data []byte
 }
 
 type TemplateFields struct {
@@ -32,12 +27,6 @@ type TemplateFields struct {
 
 //go:embed templates
 var templatesFS embed.FS
-
-func DateEqual(date1, date2 time.Time) bool {
-	y1, m1, d1 := date1.UTC().Date()
-	y2, m2, d2 := date2.UTC().Date()
-	return y1 == y2 && m1 == m2 && d1 == d2
-}
 
 func main() {
 	args := os.Args[1:]
@@ -52,12 +41,6 @@ func main() {
 		panic(err)
 	}
 
-	referenceFile, err := os.OpenFile(filepath.Join(baseDir, "files.json"), os.O_RDWR|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	defer referenceFile.Close()
-
 	templates, err := template.ParseFS(templatesFS, "templates/*.md")
 	if err != nil {
 		panic(err)
@@ -65,10 +48,8 @@ func main() {
 
 	for _, arg := range args {
 		if arg == "--today" {
-			if err != nil {
-				panic(err)
-			}
 			today := time.Now()
+			name := ""
 			file, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, os.ModePerm)
 			if (err) != nil {
 				panic(err)
@@ -85,28 +66,28 @@ func main() {
 					panic(err)
 				}
 			}
-		} else if arg == "--sync" {
-			s3 := NewS3Sync()
-			sync(baseDir, s3)
-		} else {
-			err := os.MkdirAll(notesDir, os.ModePerm)
-			if err != nil {
-				panic(err)
-			}
-			id, err := uuid.NewV7()
-			if err != nil {
-				panic(err)
-			}
-			file, err := os.Create(filepath.Join(notesDir, fmt.Sprintf("%s.md", id.String())))
-			if err != nil {
-				panic(err)
-			}
-			defer file.Close()
-			noteTemplate := TemplateFields{Name: arg}
-			err = templates.ExecuteTemplate(file, "note.md", noteTemplate)
-			if err != nil {
-				panic(err)
-			}
-		}
+		} // else if arg == "--sync" {
+		//		s3 := NewS3Sync()
+		//		sync(baseDir, s3)
+		//	} else {
+		//		err := os.MkdirAll(notesDir, os.ModePerm)
+		//		if err != nil {
+		//			panic(err)
+		//		}
+		//		id, err := uuid.NewV7()
+		//		if err != nil {
+		//			panic(err)
+		//		}
+		//		file, err := os.Create(filepath.Join(notesDir, fmt.Sprintf("%s.md", id.String())))
+		//		if err != nil {
+		//			panic(err)
+		//		}
+		//		defer file.Close()
+		//		noteTemplate := TemplateFields{Name: arg}
+		//		err = templates.ExecuteTemplate(file, "note.md", noteTemplate)
+		//		if err != nil {
+		//			panic(err)
+		//		}
+		//	}
 	}
 }
