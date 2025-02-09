@@ -5,16 +5,25 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-const BASE_DIR = "therion"
-const DAILY_DIR = "daily"
-const NOTES_DIR = "notes"
+const BASE_DIR = ".therion"
+
+type operation string
+
+const ()
+
+type file struct {
+	Id      uuid.UUID `json:"id"`
+	Path    string    `json:"path"`
+	modTime time.Time
+	data    []byte
+	op      operation
+}
 
 type TemplateFields struct {
 	Name string
@@ -23,14 +32,6 @@ type TemplateFields struct {
 
 //go:embed templates
 var templatesFS embed.FS
-
-func ensureDirectoryExists(dir string) string {
-	err := os.Mkdir(dir, os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		panic(err)
-	}
-	return dir
-}
 
 func DateEqual(date1, date2 time.Time) bool {
 	y1, m1, d1 := date1.UTC().Date()
@@ -46,9 +47,16 @@ func main() {
 		panic(err)
 	}
 	baseDir := filepath.Join(homeDir, BASE_DIR)
-	ensureDirectoryExists(baseDir)
-	dailyDir := filepath.Join(baseDir, DAILY_DIR)
-	notesDir := filepath.Join(baseDir, NOTES_DIR)
+	err = os.MkdirAll(baseDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	referenceFile, err := os.OpenFile(filepath.Join(baseDir, "files.json"), os.O_RDWR|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	defer referenceFile.Close()
 
 	templates, err := template.ParseFS(templatesFS, "templates/*.md")
 	if err != nil {
@@ -57,37 +65,20 @@ func main() {
 
 	for _, arg := range args {
 		if arg == "--today" {
-			ensureDirectoryExists(dailyDir)
-			today := time.Now()
-			todayExists := false
-			err = filepath.WalkDir(dailyDir, func(name string, _ os.DirEntry, err error) error {
-				if err != nil {
-					return err
-				}
-				if name == dailyDir {
-					return nil
-				}
-				name = filepath.Base(name)
-				name = strings.Replace(name, filepath.Ext(name), "", 1)
-				date, err := time.Parse(time.DateOnly, name)
-				if err != nil {
-					return nil
-				}
-				if DateEqual(today, date) {
-					todayExists = true
-					return filepath.SkipAll
-				}
-				return nil
-			})
 			if err != nil {
 				panic(err)
 			}
-			if !todayExists {
-				file, err := os.Create(filepath.Join(dailyDir, fmt.Sprintf("%s.md", today.Format(time.DateOnly))))
-				if (err) != nil {
-					panic(err)
-				}
-				defer file.Close()
+			today := time.Now()
+			file, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, os.ModePerm)
+			if (err) != nil {
+				panic(err)
+			}
+			defer file.Close()
+			info, err := file.Stat()
+			if err != nil {
+				panic(err)
+			}
+			if info.Size() == 0 {
 				dailyTemplate := TemplateFields{Date: time.Now().Format(time.RFC3339)}
 				err = templates.ExecuteTemplate(file, "daily.md", dailyTemplate)
 				if err != nil {
@@ -98,7 +89,10 @@ func main() {
 			s3 := NewS3Sync()
 			sync(baseDir, s3)
 		} else {
-			ensureDirectoryExists(notesDir)
+			err := os.MkdirAll(notesDir, os.ModePerm)
+			if err != nil {
+				panic(err)
+			}
 			id, err := uuid.NewV7()
 			if err != nil {
 				panic(err)
