@@ -9,18 +9,20 @@ import (
 
 func main() {
 	devMode := false
-	reload := make(chan bool)
 	args := os.Args[1:]
-	w := webview.New(false)
-	defer w.Destroy()
 	for _, arg := range args {
 		if arg == "--dev" {
 			devMode = true
 		}
 	}
+
+	w := webview.New(devMode)
+	defer w.Destroy()
+
 	server := newServer(devMode)
 	go server.start()
 	if devMode {
+		reload := make(chan bool)
 		go startDevMode(reload)
 		go func() {
 			for range reload {

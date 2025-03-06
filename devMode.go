@@ -7,7 +7,7 @@ import (
 )
 
 func startDevMode(reload chan bool) {
-	cmd := exec.Command("npx", "@tailwindcss/cli", "-i", "./assets/input.css", "-o", "./assets/output.css", "--watch=always")
+	cmd := exec.Command("tailwindcss", "-i", "./assets/input.css", "-o", "./assets/output.css", "--watch=always")
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		panic(err)

@@ -2,10 +2,53 @@
   <head>
     <script src="/assets/htmx.min.js"></script>
     <link href="/assets/output.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body>
-    <button hx-post="/clicked" hx-swap="outerHTML" class="btn btn-primary">
-      Click Me
-    </button>
+    <!-- navbar -->
+    <div class="navbar bg-base-100">
+      <div class="flex-none">
+        <button
+          class="btn btn-square btn-ghost"
+          hx-get="/toggle-sidebar"
+          hx-target="sidebar"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="flex-1">
+        <a class="btn btn-ghost text-lg">Therion</a>
+      </div>
+    </div>
+    <!--navbar-->
+
+    <div class="flex">
+      <div id="sidebar" class="resize-x overflow-scroll">
+        <ul class="menu bg-base-200 text-base-content w-80 p-4">
+          <li class="menu-title">Vaults</li>
+          <li><a>Sidebar Item 1</a></li>
+          <li><a>Sidebar Item 2</a></li>
+        </ul>
+      </div>
+      <textarea class="textarea textarea-ghost h-full w-full"></textarea>
+    </div>
   </body>
 </html>

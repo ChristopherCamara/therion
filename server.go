@@ -59,15 +59,13 @@ func (s *server) start() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		buffer := &bytes.Buffer{}
-		err := s.templates.ExecuteTemplate(buffer, "index.html", nil)
+		err := s.templates.ExecuteTemplate(buffer, "index.html", s)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Fprint(w, buffer)
 	})
-	http.HandleFunc("/clicked", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Here!")
-	})
+	//http.HandleFunc("/sidebar", )
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", SERVER_PORT), nil))
 }
