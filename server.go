@@ -46,7 +46,6 @@ func (s *server) loadTemplates() {
 			panic(err)
 		}
 	}
-
 }
 
 func (s *server) start() {
@@ -65,7 +64,10 @@ func (s *server) start() {
 		}
 		fmt.Fprint(w, buffer)
 	})
-	//http.HandleFunc("/sidebar", )
+
+	http.HandleFunc("/add-page", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "<li>hello world!</li>")
+	})
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", SERVER_PORT), nil))
 }

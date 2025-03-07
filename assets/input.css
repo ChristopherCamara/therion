@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+.gutter {
+  background-color: oklch(98% 0 0);
+
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter:hover {
+  cursor: col-resize;
+}

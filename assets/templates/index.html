@@ -8,47 +8,81 @@
       type="text/css"
     />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+    <script>
+      window.addEventListener("load", function () {
+        window.Split(["#sidebar", "#page"], {
+          sizes: [15, 85],
+        });
+      });
+    </script>
   </head>
   <body>
     <!-- navbar -->
-    <div class="navbar bg-base-100">
-      <div class="flex-none">
-        <button
-          class="btn btn-square btn-ghost"
-          hx-get="/toggle-sidebar"
-          hx-target="sidebar"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </button>
-      </div>
-      <div class="flex-1">
-        <a class="btn btn-ghost text-lg">Therion</a>
-      </div>
-    </div>
+    <!--<div class="navbar bg-base-200 shadow-sm fixed">-->
+    <!--  <div class="flex-none">-->
+    <!--    <button-->
+    <!--      class="btn btn-square btn-ghost"-->
+    <!--      hx-get="/toggle-sidebar"-->
+    <!--      hx-target="sidebar"-->
+    <!--    >-->
+    <!--      <svg-->
+    <!--        xmlns="http://www.w3.org/2000/svg"-->
+    <!--        fill="none"-->
+    <!--        viewBox="0 0 24 24"-->
+    <!--        stroke-width="1.5"-->
+    <!--        stroke="currentColor"-->
+    <!--        class="size-6"-->
+    <!--      >-->
+    <!--        <path-->
+    <!--          stroke-linecap="round"-->
+    <!--          stroke-linejoin="round"-->
+    <!--          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"-->
+    <!--        />-->
+    <!--      </svg>-->
+    <!--    </button>-->
+    <!--  </div>-->
+    <!--  <div class="flex-1">-->
+    <!--    <a class="btn btn-ghost text-lg">Therion</a>-->
+    <!--  </div>-->
+    <!--</div>-->
     <!--navbar-->
 
-    <div class="flex">
-      <div id="sidebar" class="resize-x overflow-scroll">
-        <ul class="menu bg-base-200 text-base-content w-80 p-4">
-          <li class="menu-title">Vaults</li>
-          <li><a>Sidebar Item 1</a></li>
-          <li><a>Sidebar Item 2</a></li>
+    <div class="flex h-full">
+      <div id="sidebar" class="sticky">
+        <ul class="menu bg-base-200 w-full h-full">
+          <li>
+            <details open>
+              <summary class="hover:bg-base-200">Pages</summary>
+              <ul>
+                <li>
+                  <a
+                    hx-get="/add-page"
+                    hx-target="closest li"
+                    hx-swap="beforebegin"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      class="size-4"
+                    >
+                      <path
+                        d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
+                      />
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </details>
+          </li>
         </ul>
       </div>
-      <textarea class="textarea textarea-ghost h-full w-full"></textarea>
+      <div id="page">
+        <textarea
+          class="textarea textarea-ghost w-full h-full resize-none focus:outline-none"
+        ></textarea>
+      </div>
     </div>
   </body>
 </html>
